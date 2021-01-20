@@ -1,13 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DataAnnotationsExtensions;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.Dtos
 {
     public class UserAccountDto
     {
-        [Required(ErrorMessage = "The {0} field is required")]
+        [Required(ErrorMessage = "The Email field is required"), Email]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "The {0} field is required")]
+        [Required(ErrorMessage = "The Password field is required")]
         public string Password { get; set; }
     }
 }
