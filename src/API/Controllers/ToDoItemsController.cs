@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/ToDoItems")]
+    [Route("ToDoItems")]
     public class ToDoItemsController : Controller
     {
         private readonly Context db;
