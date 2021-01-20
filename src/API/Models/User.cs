@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.Models
 {
@@ -10,12 +8,14 @@ namespace API.Models
         private User() { }
         public User(string email, string password, string role)
         {
+            Id = Guid.NewGuid();
             Email = email;
             Password = password;
             Role = role;
         }
 
-        public int Id { get; private set; }
+        [Key]
+        public Guid Id { get; private set; }
         public string Email { get; private set; }
         public string Password { get; private set; }
         public string Role { get; set; }
