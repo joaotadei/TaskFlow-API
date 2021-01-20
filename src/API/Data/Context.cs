@@ -7,8 +7,7 @@ namespace API.Data
     {
         public Context(DbContextOptions<Context> options) : base(options) { }
 
-        public DbSet<Usuario> Usuarios { get; set; }
-        public DbSet<ToDoItem> ToDoItems { get; set; }
-
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<ToDoItem> ToDoItems { get; set; }
     }
 }
