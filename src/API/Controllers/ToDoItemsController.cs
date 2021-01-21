@@ -3,6 +3,7 @@ using API.Dtos;
 using API.Helpers;
 using API.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -26,8 +27,13 @@ namespace API.Controllers
             this.toDoItemService = toDoItemService;
         }
 
+        /// <summary>
+        /// Retorna os itens a fazer do usuário logado.
+        /// </summary>
         [Authorize(Roles = AccountHelper.DefaultUserRole)]
         [HttpGet()]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> Index()
         {
             var user = await userService.GetByEmail(User.Identity.Name);
@@ -37,6 +43,9 @@ namespace API.Controllers
             return Ok(items);
         }
 
+        /// <summary>
+        /// Retorna os itens a fazer do usuário logado.
+        /// </summary>
         [Authorize(Roles = AccountHelper.DefaultUserRole)]
         [HttpPost()]
         public async Task<dynamic> Create([FromBody] CreateToDoItemDto modelDto)
@@ -49,6 +58,9 @@ namespace API.Controllers
             return Ok(item);
         }
 
+        /// <summary>
+        /// Retorna os itens a fazer do usuário logado.
+        /// </summary>
         [Authorize(Roles = AccountHelper.DefaultUserRole)]
         [HttpPatch("concluir/{id}")]
         public async Task<dynamic> Finish(Guid id)
@@ -67,6 +79,9 @@ namespace API.Controllers
             return Ok(new ToDoItemDto(item));
         }
 
+        /// <summary>
+        /// Retorna os itens a fazer do usuário logado.
+        /// </summary>
         [Authorize(Roles = AccountHelper.DefaultUserRole)]
         [HttpPatch()]
         public async Task<dynamic> Update([FromBody] UpdateToDoItemDto modelDto)
@@ -88,6 +103,9 @@ namespace API.Controllers
             return Ok(new ToDoItemDto(item));
         }
 
+        /// <summary>
+        /// Retorna os itens a fazer do usuário logado.
+        /// </summary>
         [Authorize(Roles = AccountHelper.DefaultUserRole)]
         [HttpDelete("{id}")]
         public async Task<dynamic> Delete(Guid id)
@@ -106,6 +124,9 @@ namespace API.Controllers
             return Ok("Item removido");
         }
 
+        /// <summary>
+        /// Retorna os itens a fazer do usuário logado.
+        /// </summary>
         [Authorize(Roles = AccountHelper.AdminUserRole)]
         [HttpGet("listarTodos/{page}")]
         public async Task<dynamic> GetAll(int? page)
@@ -119,6 +140,9 @@ namespace API.Controllers
             return Ok(items.Select(x => new ToDoItemDto(x)).ToList());
         }
 
+        /// <summary>
+        /// Retorna os itens a fazer do usuário logado.
+        /// </summary>
         [Authorize(Roles = AccountHelper.AdminUserRole)]
         [HttpGet("filtrarAtrasados/{filtro}")]
         public async Task<dynamic> GetAllDelayed(string filtro = "")

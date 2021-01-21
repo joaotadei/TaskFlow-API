@@ -13,6 +13,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace API
@@ -58,9 +62,10 @@ namespace API
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
-            services.AddSwaggerGen(c => {
+            services.AddSwaggerGen(x =>
+            {
 
-                c.SwaggerDoc("v1",
+                x.SwaggerDoc("v1",
                     new OpenApiInfo
                     {
                         Title = "ToDo API",
@@ -72,6 +77,35 @@ namespace API
                             Url = new Uri("https://github.com/joaotadei")
                         }
                     });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                x.IncludeXmlComments(xmlPath);
+
+                OpenApiSecurityScheme securityDefinition = new OpenApiSecurityScheme()
+                {
+                    Name = "Bearer",
+                    BearerFormat = "JWT",
+                    Scheme = "bearer",
+                    Description = "Specify the authorization token.",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                };
+                x.AddSecurityDefinition("jwt_auth", securityDefinition);
+
+                OpenApiSecurityScheme securityScheme = new OpenApiSecurityScheme()
+                {
+                    Reference = new OpenApiReference()
+                    {
+                        Id = "jwt_auth",
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+                OpenApiSecurityRequirement securityRequirements = new OpenApiSecurityRequirement()
+                {
+                    {securityScheme, new string[] { }},
+                };
+                x.AddSecurityRequirement(securityRequirements);
             });
 
             services.AddCors();
@@ -88,10 +122,10 @@ namespace API
             }
 
             app.UseSwagger();
-            
-            app.UseSwaggerUI(c =>
+
+            app.UseSwaggerUI(x =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ToDo list API");
+                x.SwaggerEndpoint("/swagger/v1/swagger.json", "ToDo list API");
             });
 
             app.UseHttpsRedirection();

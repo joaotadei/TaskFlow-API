@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>API</name>
+    </assembly>
+    <members>
+        <member name="M:API.Controllers.ToDoItemsController.Index">
+            <summary>
+            Retorna os itens a fazer do usuário logado.
+            </summary>
+        </member>
+        <member name="M:API.Controllers.ToDoItemsController.Create(API.Dtos.CreateToDoItemDto)">
+            <summary>
+            Retorna os itens a fazer do usuário logado.
+            </summary>
+        </member>
+        <member name="M:API.Controllers.ToDoItemsController.Finish(System.Guid)">
+            <summary>
+            Retorna os itens a fazer do usuário logado.
+            </summary>
+        </member>
+        <member name="M:API.Controllers.ToDoItemsController.Update(API.Dtos.UpdateToDoItemDto)">
+            <summary>
+            Retorna os itens a fazer do usuário logado.
+            </summary>
+        </member>
+        <member name="M:API.Controllers.ToDoItemsController.Delete(System.Guid)">
+            <summary>
+            Retorna os itens a fazer do usuário logado.
+            </summary>
+        </member>
+        <member name="M:API.Controllers.ToDoItemsController.GetAll(System.Nullable{System.Int32})">
+            <summary>
+            Retorna os itens a fazer do usuário logado.
+            </summary>
+        </member>
+        <member name="M:API.Controllers.ToDoItemsController.GetAllDelayed(System.String)">
+            <summary>
+            Retorna os itens a fazer do usuário logado.
+            </summary>
+        </member>
+    </members>
+</doc>
