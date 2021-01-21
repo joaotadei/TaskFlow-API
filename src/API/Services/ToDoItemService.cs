@@ -31,14 +31,5 @@ namespace API.Services
 
             return new ToDoItemDto(newItem);
         }
-
-        //public async Task Update(UpdateToDoItemDto modelDto, ClaimsPrincipal userIdentity)
-        //{
-        //    var user = await userService.GetByEmail(userIdentity.Identity.Name);
-
-        //    user.AddToDoItem(modelDto.Description, modelDto.Expiration);
-
-        //    await db.SaveChangesAsync();
-        //}
     }
 }
