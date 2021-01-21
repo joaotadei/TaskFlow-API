@@ -13,7 +13,5 @@ namespace API.Data
 
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<ToDoItem> ToDoItems { get; set; }
-
-
     }
 }

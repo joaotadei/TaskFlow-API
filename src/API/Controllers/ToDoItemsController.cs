@@ -115,10 +115,10 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Deletar um item
+        /// Deletar um item (Admin)
         /// </summary>
         /// <param name="id"></param>
-        /// <remarks>Apenas o admin pode deletar um item</remarks>
+        /// <remarks>Apenas o admin pode deletar um item </remarks>
         /// <returns></returns>
         [Authorize(Roles = AccountHelper.AdminUserRole)]
         [HttpDelete("{id}")]
@@ -138,37 +138,37 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Lista todos os itens criados pelos usuarios
+        /// Lista todos os itens criados pelos usuarios (Admin)
         /// </summary>
-        /// <param name="page"></param>
+        /// <param name="pageNumber"></param>
         /// <remarks>Apenas o admin pode listar</remarks>
         /// <returns></returns>
         [Authorize(Roles = AccountHelper.AdminUserRole)]
         [HttpGet("listarTodos/{page}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<dynamic> GetAll(int? page)
+        public async Task<dynamic> GetAll(int? pageNumber)
         {
-            page = (page ?? 1);
+            pageNumber = (pageNumber ?? 1);
 
             var items = await db.ToDoItems
                 .Include(x => x.User)
-                .ToPagedListAsync(page, 5);
+                .ToPagedListAsync(pageNumber, 5);
 
             return Ok(items.Select(x => new ToDoItemDto(x)).ToList());
         }
 
         /// <summary>
-        /// Buscar em itens atrasados
+        /// Buscar em itens atrasados (Admin)
         /// </summary>
         /// <param name="filtro"></param>
         /// <remarks>Apenas o admin pode listar</remarks>
         /// <returns></returns>
         [Authorize(Roles = AccountHelper.AdminUserRole)]
-        [HttpGet("filtrarAtrasados/{filtro}")]
+        [HttpGet("buscarItensAtrasadosPorDescricaoOuData/{filtro}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<dynamic> GetAllDelayed(string filtro = "")
+        public async Task<dynamic> FindByDescriptionDataDelayed(string filtro = "")
         {
             filtro = filtro.ToLower();
 

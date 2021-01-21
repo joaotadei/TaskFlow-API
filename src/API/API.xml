@@ -14,43 +14,61 @@
             Efetuar login
             </summary>
             <param name="userAuthenticate"></param>
-            <remarks>Usuário admin padrão - login: "admin@admin.com" password: "123456"</remarks>
-            <returns>Retorna o usuário logado junto ao token de autenticação</returns>
+            <remarks>Usuário admin padrão - login: "admin@admin.com" password: "123456". Retorna o usuário logado junto ao token de autenticação</remarks>
+        </member>
+        <member name="T:API.Controllers.ToDoItemsController">
+            <summary>
+            Itens a fazer
+            </summary>
         </member>
         <member name="M:API.Controllers.ToDoItemsController.Index">
             <summary>
-            Retorna os itens a fazer do usuário logado.
+            Lista os itens a fazer do usuário logado.
             </summary>
         </member>
         <member name="M:API.Controllers.ToDoItemsController.Create(API.Dtos.CreateToDoItemDto)">
             <summary>
-            Retorna os itens a fazer do usuário logado.
+            Criar um novo item a fazer
             </summary>
+            <param name="modelDto"></param>
         </member>
         <member name="M:API.Controllers.ToDoItemsController.Finish(System.Guid)">
             <summary>
-            Retorna os itens a fazer do usuário logado.
+            Concluir um item
             </summary>
+            <param name="id"></param>
+            <returns></returns>
         </member>
         <member name="M:API.Controllers.ToDoItemsController.Update(API.Dtos.UpdateToDoItemDto)">
             <summary>
-            Retorna os itens a fazer do usuário logado.
+            Atualizar a descrição e data de vencimento de um item
             </summary>
+            <remarks>Um item já finalizado não poderar mais ser alterado</remarks>
+            <param name="modelDto"></param>
         </member>
         <member name="M:API.Controllers.ToDoItemsController.Delete(System.Guid)">
             <summary>
-            Retorna os itens a fazer do usuário logado.
+            Deletar um item (Admin)
             </summary>
+            <param name="id"></param>
+            <remarks>Apenas o admin pode deletar um item </remarks>
+            <returns></returns>
         </member>
         <member name="M:API.Controllers.ToDoItemsController.GetAll(System.Nullable{System.Int32})">
             <summary>
-            Retorna os itens a fazer do usuário logado.
+            Lista todos os itens criados pelos usuarios (Admin)
             </summary>
+            <param name="pageNumber"></param>
+            <remarks>Apenas o admin pode listar</remarks>
+            <returns></returns>
         </member>
-        <member name="M:API.Controllers.ToDoItemsController.GetAllDelayed(System.String)">
+        <member name="M:API.Controllers.ToDoItemsController.FindByDescriptionDataDelayed(System.String)">
             <summary>
-            Retorna os itens a fazer do usuário logado.
+            Buscar em itens atrasados (Admin)
             </summary>
+            <param name="filtro"></param>
+            <remarks>Apenas o admin pode listar</remarks>
+            <returns></returns>
         </member>
     </members>
 </doc>
