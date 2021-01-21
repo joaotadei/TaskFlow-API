@@ -10,7 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using System;
 using System.Text;
 
 namespace API
@@ -56,16 +58,41 @@ namespace API
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
+            services.AddSwaggerGen(c => {
+
+                c.SwaggerDoc("v1",
+                    new OpenApiInfo
+                    {
+                        Title = "ToDo API",
+                        Version = "v1.0",
+                        Description = "Exemplo de API criada com o ASP.NET Core 3.1 para registros de itens a fazer",
+                        Contact = new OpenApiContact
+                        {
+                            Name = "João Vitor Tadei",
+                            Url = new Uri("https://github.com/joaotadei")
+                        }
+                    });
+            });
+
             services.AddCors();
             services.AddControllers();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseStaticFiles();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwagger();
+            
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ToDo list API");
+            });
 
             app.UseHttpsRedirection();
 
