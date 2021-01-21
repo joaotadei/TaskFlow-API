@@ -22,6 +22,9 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return createUserAccount;
 
+            if (accountService.AlreadyExisting(createUserAccount.Email))
+                return Ok("Email já cadastrado");
+
             var newUser = await accountService.CreateUser(createUserAccount);
 
             return newUser;

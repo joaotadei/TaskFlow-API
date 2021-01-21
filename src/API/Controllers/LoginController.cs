@@ -13,10 +13,12 @@ namespace API.Controllers
     {
         private readonly TokenService tokenService;
         private readonly UserService userService;
-        public LoginController(TokenService tokenService, UserService userService)
+        private readonly AccountService accountService;
+        public LoginController(TokenService tokenService, UserService userService, AccountService accountService)
         {
             this.tokenService = tokenService;
             this.userService = userService;
+            this.accountService = accountService;
         }
 
         [HttpPost]
