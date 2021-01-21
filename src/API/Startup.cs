@@ -87,7 +87,7 @@ namespace API
                     Name = "Bearer",
                     BearerFormat = "JWT",
                     Scheme = "bearer",
-                    Description = "Specify the authorization token.",
+                    Description = "Insira seu token de autorização gerado no login.",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
                 };

@@ -4,6 +4,19 @@
         <name>API</name>
     </assembly>
     <members>
+        <member name="M:API.Controllers.AccountsController.Create(API.Dtos.UserAccountDto)">
+            <summary>
+            Criar um usuário.
+            </summary>
+        </member>
+        <member name="M:API.Controllers.LoginController.Authenticate(API.Dtos.UserAccountDto)">
+            <summary>
+            Efetuar login
+            </summary>
+            <param name="userAuthenticate"></param>
+            <remarks>Usuário admin padrão - login: "admin@admin.com" password: "123456"</remarks>
+            <returns>Retorna o usuário logado junto ao token de autenticação</returns>
+        </member>
         <member name="M:API.Controllers.ToDoItemsController.Index">
             <summary>
             Retorna os itens a fazer do usuário logado.

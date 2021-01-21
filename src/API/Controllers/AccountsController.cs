@@ -1,6 +1,7 @@
 ﻿using API.Dtos;
 using API.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -16,7 +17,13 @@ namespace API.Controllers
             this.accountService = accountService;
         }
 
-        [HttpPost(), AllowAnonymous]
+        /// <summary>
+        /// Criar um usuário.
+        /// </summary>
+        [AllowAnonymous]
+        [HttpPost()]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> Create([FromBody] UserAccountDto createUserAccount)
         {
             if (!ModelState.IsValid)

@@ -28,7 +28,7 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Retorna os itens a fazer do usuário logado.
+        /// Lista os itens a fazer do usuário logado.
         /// </summary>
         [Authorize(Roles = AccountHelper.DefaultUserRole)]
         [HttpGet()]
@@ -44,10 +44,13 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Retorna os itens a fazer do usuário logado.
+        /// Criar um novo item a fazer
         /// </summary>
+        /// <param name="modelDto"></param>
         [Authorize(Roles = AccountHelper.DefaultUserRole)]
         [HttpPost()]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> Create([FromBody] CreateToDoItemDto modelDto)
         {
             if (!ModelState.IsValid)
@@ -59,10 +62,14 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Retorna os itens a fazer do usuário logado.
+        /// Concluir um item
         /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [Authorize(Roles = AccountHelper.DefaultUserRole)]
         [HttpPatch("concluir/{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> Finish(Guid id)
         {
             var user = await userService.GetByEmail(User.Identity.Name);
@@ -80,10 +87,14 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Retorna os itens a fazer do usuário logado.
+        /// Atualizar a descrição e data de vencimento de um item
         /// </summary>
+        /// <remarks>Um item já finalizado não poderar mais ser alterado</remarks>
+        /// <param name="modelDto"></param>
         [Authorize(Roles = AccountHelper.DefaultUserRole)]
         [HttpPatch()]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> Update([FromBody] UpdateToDoItemDto modelDto)
         {
             var user = await userService.GetByEmail(User.Identity.Name);
@@ -104,31 +115,38 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Retorna os itens a fazer do usuário logado.
+        /// Deletar um item
         /// </summary>
-        [Authorize(Roles = AccountHelper.DefaultUserRole)]
+        /// <param name="id"></param>
+        /// <remarks>Apenas o admin pode deletar um item</remarks>
+        /// <returns></returns>
+        [Authorize(Roles = AccountHelper.AdminUserRole)]
         [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> Delete(Guid id)
         {
-            var user = await userService.GetByEmail(User.Identity.Name);
-
-            var item = user.ToDoItems.FirstOrDefault(x => x.Id == id);
+            var item = await db.ToDoItems.FindAsync(id);
 
             if (item is null)
                 return NotFound("Item não encontrado");
 
-            user.ToDoItems.Remove(item);
-
+            db.Remove(item);
             await db.SaveChangesAsync();
 
             return Ok("Item removido");
         }
 
         /// <summary>
-        /// Retorna os itens a fazer do usuário logado.
+        /// Lista todos os itens criados pelos usuarios
         /// </summary>
+        /// <param name="page"></param>
+        /// <remarks>Apenas o admin pode listar</remarks>
+        /// <returns></returns>
         [Authorize(Roles = AccountHelper.AdminUserRole)]
         [HttpGet("listarTodos/{page}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> GetAll(int? page)
         {
             page = (page ?? 1);
@@ -141,10 +159,15 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Retorna os itens a fazer do usuário logado.
+        /// Buscar em itens atrasados
         /// </summary>
+        /// <param name="filtro"></param>
+        /// <remarks>Apenas o admin pode listar</remarks>
+        /// <returns></returns>
         [Authorize(Roles = AccountHelper.AdminUserRole)]
         [HttpGet("filtrarAtrasados/{filtro}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> GetAllDelayed(string filtro = "")
         {
             filtro = filtro.ToLower();
