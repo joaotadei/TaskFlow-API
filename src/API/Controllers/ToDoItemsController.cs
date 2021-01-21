@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -24,15 +25,6 @@ namespace API.Controllers
         }
 
         [Authorize()]
-        [HttpGet()]
-        public async Task<List<ToDoItem>> GetAll()
-        {
-            var user = await userService.GetByEmail(User.Identity.Name);
-
-            return user.ToDoItems;
-        }
-
-        [Authorize()]
         [HttpPost()]
         public async Task<dynamic> Create([FromBody] CreateToDoItemDto modelDto)
         {
@@ -46,23 +38,39 @@ namespace API.Controllers
             db.Update(user);
             await db.SaveChangesAsync();
 
-            return Ok();
+            return Ok("Inserido com sucesso");
         }
 
         [Authorize()]
-        [HttpGet("{id}")]
-        public async Task<dynamic> GetById(Guid id)
+        [HttpGet()]
+        public async Task<List<ToDoItem>> GetAll()
         {
-            var toDoItem = await db.ToDoItems.SingleOrDefaultAsync(x => x.Id == id);
+            var user = await userService.GetByEmail(User.Identity.Name);
 
-            if (toDoItem is null)
-                return NotFound();
-
-            return toDoItem;
+            return user.ToDoItems;
         }
 
         [Authorize()]
-        [HttpPut()]
+        [HttpPatch("concluir/{id}")]
+        public async Task<dynamic> Finish(Guid id)
+        {
+            var user = await userService.GetByEmail(User.Identity.Name);
+
+            var item = user.ToDoItems.FirstOrDefault(x => x.Id == id);
+
+            if (item is null)
+                return NotFound("Item não encontrado");
+
+            item.Finish();
+
+            db.Update(user);
+            await db.SaveChangesAsync();
+
+            return Ok(item);
+        }
+
+        [Authorize()]
+        [HttpPatch()]
         public async Task<dynamic> Update([FromBody] UpdateToDoItemDto modelDto)
         {
             var toDoItem = await db.ToDoItems.SingleOrDefaultAsync(x => x.Id == modelDto.Id);
@@ -74,7 +82,7 @@ namespace API.Controllers
 
             await db.SaveChangesAsync();
 
-            return toDoItem;
+            return Ok(toDoItem);
         }
 
         [Authorize()]

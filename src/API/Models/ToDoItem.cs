@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace API.Models
@@ -20,12 +21,25 @@ namespace API.Models
         public DateTime Expiration { get; private set; }
         public DateTime Creation { get; private set; }
         public DateTime? Finished { get; private set; }
+        public List<Log> UpdatesLogs { get; private set; } = new List<Log>();
 
         public void UpdateDescriptionAndExpiration(string description, DateTime expiration)
         {
             this.Description = description;
             this.Expiration = expiration;
+
+            LogAction("Updated item");
         }
-        public void Finish() => this.Finished = DateTime.Now;
+        public void Finish()
+        {
+            this.Finished = DateTime.Now;
+
+            LogAction("Finished item");
+        }
+
+        private void LogAction(string description)
+        {
+            this.UpdatesLogs.Add(new Log(description));
+        }
     }
 }
