@@ -7,7 +7,13 @@ namespace API.Data
     {
         public Context(DbContextOptions<Context> options) : base(options) { }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+        }
+
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<ToDoItem> ToDoItems { get; set; }
+
+
     }
 }

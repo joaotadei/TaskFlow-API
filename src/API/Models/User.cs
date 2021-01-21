@@ -22,9 +22,9 @@ namespace API.Models
         public string Role { get; set; }
         public List<ToDoItem> ToDoItems { get; private set; } = new List<ToDoItem>();
 
-        public void AddToDoItem(string description, DateTime expiration)
+        public void AddToDoItem(ToDoItem item)
         {
-            this.ToDoItems.Add(new ToDoItem(description, expiration));
+            this.ToDoItems.Add(item);
         }
         public void CleanPassword() => this.Password = "";
     }

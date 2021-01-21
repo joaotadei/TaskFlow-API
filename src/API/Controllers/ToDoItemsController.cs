@@ -1,14 +1,14 @@
 ﻿using API.Data;
 using API.Dtos;
-using API.Models;
+using API.Helpers;
 using API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using X.PagedList;
 
 namespace API.Controllers
 {
@@ -18,39 +18,38 @@ namespace API.Controllers
     {
         private readonly Context db;
         private readonly UserService userService;
-        public ToDoItemsController(Context db, UserService userService)
+        private readonly ToDoItemService toDoItemService;
+        public ToDoItemsController(Context db, UserService userService, ToDoItemService toDoItemService)
         {
             this.db = db;
             this.userService = userService;
+            this.toDoItemService = toDoItemService;
         }
 
-        [Authorize()]
+        [Authorize(Roles = AccountHelper.DefaultUserRole)]
+        [HttpGet()]
+        public async Task<dynamic> Index()
+        {
+            var user = await userService.GetByEmail(User.Identity.Name);
+
+            var items = user.ToDoItems.Select(x => new ToDoItemDto(x));
+
+            return Ok(items);
+        }
+
+        [Authorize(Roles = AccountHelper.DefaultUserRole)]
         [HttpPost()]
         public async Task<dynamic> Create([FromBody] CreateToDoItemDto modelDto)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return modelDto;
 
-            var user = await userService.GetByEmail(User.Identity.Name);
+            var item = await toDoItemService.CreateNew(modelDto, User);
 
-            user.AddToDoItem(modelDto.Description, modelDto.Expiration);
-
-            db.Update(user);
-            await db.SaveChangesAsync();
-
-            return Ok("Inserido com sucesso");
+            return Ok(item);
         }
 
-        [Authorize()]
-        [HttpGet()]
-        public async Task<List<ToDoItem>> GetAll()
-        {
-            var user = await userService.GetByEmail(User.Identity.Name);
-
-            return user.ToDoItems;
-        }
-
-        [Authorize()]
+        [Authorize(Roles = AccountHelper.DefaultUserRole)]
         [HttpPatch("concluir/{id}")]
         public async Task<dynamic> Finish(Guid id)
         {
@@ -61,43 +60,80 @@ namespace API.Controllers
             if (item is null)
                 return NotFound("Item não encontrado");
 
-            item.Finish();
+            user.ToDoItems.FirstOrDefault(x => x.Id == id).Finish();
 
-            db.Update(user);
             await db.SaveChangesAsync();
 
-            return Ok(item);
+            return Ok(new ToDoItemDto(item));
         }
 
-        [Authorize()]
+        [Authorize(Roles = AccountHelper.DefaultUserRole)]
         [HttpPatch()]
         public async Task<dynamic> Update([FromBody] UpdateToDoItemDto modelDto)
         {
-            var toDoItem = await db.ToDoItems.SingleOrDefaultAsync(x => x.Id == modelDto.Id);
+            var user = await userService.GetByEmail(User.Identity.Name);
 
-            if (toDoItem is null)
-                return NotFound();
+            var item = user.ToDoItems.FirstOrDefault(x => x.Id == modelDto.Id);
 
-            toDoItem.UpdateDescriptionAndExpiration(modelDto.Description, modelDto.Expiration);
+            if (item is null)
+                return NotFound("Item não encontrado");
+
+            if (item.Finished.HasValue)
+                return BadRequest("Item concluído, não pode ser editado");
+
+            item.UpdateDescriptionAndExpiration(modelDto.Description, modelDto.Expiration);
 
             await db.SaveChangesAsync();
 
-            return Ok(toDoItem);
+            return Ok(new ToDoItemDto(item));
         }
 
-        [Authorize()]
+        [Authorize(Roles = AccountHelper.DefaultUserRole)]
         [HttpDelete("{id}")]
         public async Task<dynamic> Delete(Guid id)
         {
-            var toDoItem = await db.ToDoItems.SingleOrDefaultAsync(x => x.Id == id);
+            var user = await userService.GetByEmail(User.Identity.Name);
 
-            if (toDoItem is null)
-                return NotFound();
+            var item = user.ToDoItems.FirstOrDefault(x => x.Id == id);
 
-            db.Remove(toDoItem);
+            if (item is null)
+                return NotFound("Item não encontrado");
+
+            user.ToDoItems.Remove(item);
+
             await db.SaveChangesAsync();
 
             return Ok("Item removido");
+        }
+
+        [Authorize(Roles = AccountHelper.AdminUserRole)]
+        [HttpGet("listarTodos/{page}")]
+        public async Task<dynamic> GetAll(int? page)
+        {
+            page = (page ?? 1);
+
+            var items = await db.ToDoItems
+                .Include(x => x.User)
+                .ToPagedListAsync(page, 5);
+
+            return Ok(items.Select(x => new ToDoItemDto(x)).ToList());
+        }
+
+        [Authorize(Roles = AccountHelper.AdminUserRole)]
+        [HttpGet("filtrarAtrasados/{filtro}")]
+        public async Task<dynamic> GetAllDelayed(string filtro = "")
+        {
+            filtro = filtro.ToLower();
+
+            var items = await db.ToDoItems
+                .Include(x => x.User)
+                .Where(x => x.User.Email.ToLower().Contains(filtro) ||
+                            x.Description.ToLower().Contains(filtro) ||
+                            x.Creation.ToShortDateString().Contains(filtro) ||
+                            x.Expiration.ToShortDateString().Contains(filtro))
+                .ToListAsync();
+
+            return Ok(items.Where(x => x.Dalayed).Select(x => new ToDoItemDto(x)).ToList());
         }
     }
 }

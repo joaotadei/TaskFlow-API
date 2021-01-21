@@ -18,7 +18,6 @@ namespace API.Services
         {
             return await db.Users
                 .Include(x => x.ToDoItems)
-                .AsNoTracking()
                 .SingleOrDefaultAsync(x => x.Email == email);
         }
 

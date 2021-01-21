@@ -4,11 +4,13 @@ using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System.Text;
 
 namespace API
@@ -29,6 +31,7 @@ namespace API
             services.AddScoped<AccountService>();
             services.AddScoped<TokenService>();
             services.AddScoped<UserService>();
+            services.AddScoped<ToDoItemService>();
 
             var key = Encoding.ASCII.GetBytes(AccountHelper.SecretKey);
             services.AddAuthentication(x =>
@@ -48,6 +51,10 @@ namespace API
                     ValidateAudience = false
                 };
             });
+
+            services.AddMvc(option => option.EnableEndpointRouting = false)
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
             services.AddCors();
             services.AddControllers();

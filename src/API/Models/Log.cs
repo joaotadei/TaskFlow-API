@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace API.Models
 {
@@ -11,6 +12,7 @@ namespace API.Models
             Created = DateTime.Now;
         }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; private set; }
         public string Description { get; private set; }
         public DateTime Created { get; private set; }
