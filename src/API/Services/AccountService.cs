@@ -9,6 +9,7 @@ namespace API.Services
     public class AccountService
     {
         private readonly Context db;
+        private readonly UserService userService;
         public AccountService(Context db)
         {
             this.db = db;
@@ -23,5 +24,7 @@ namespace API.Services
 
             return newUser;
         }
+
+
     }
 }

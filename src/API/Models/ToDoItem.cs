@@ -19,17 +19,13 @@ namespace API.Models
         public string Description { get; private set; }
         public DateTime Expiration { get; private set; }
         public DateTime Creation { get; private set; }
-        public DateTime Finished { get; private set; }
-
+        public DateTime? Finished { get; private set; }
 
         public void UpdateDescriptionAndExpiration(string description, DateTime expiration)
         {
             this.Description = description;
             this.Expiration = expiration;
         }
-        public void Finish()
-        {
-            this.Finished = DateTime.Now;
-        }
+        public void Finish() => this.Finished = DateTime.Now;
     }
 }

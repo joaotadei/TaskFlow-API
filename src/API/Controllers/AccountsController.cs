@@ -1,5 +1,4 @@
-﻿using API.Data;
-using API.Dtos;
+﻿using API.Dtos;
 using API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +11,7 @@ namespace API.Controllers
     public class AccountsController : Controller
     {
         private readonly AccountService accountService;
-        public AccountsController(Context db, AccountService accountService)
+        public AccountsController(AccountService accountService)
         {
             this.accountService = accountService;
         }

@@ -1,6 +1,8 @@
 ﻿using API.Data;
 using API.Dtos;
 using API.Models;
+using API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,34 +16,44 @@ namespace API.Controllers
     public class ToDoItemsController : Controller
     {
         private readonly Context db;
-        public ToDoItemsController(Context db)
+        private readonly UserService userService;
+        public ToDoItemsController(Context db, UserService userService)
         {
             this.db = db;
+            this.userService = userService;
         }
 
+        [Authorize()]
         [HttpGet()]
         public async Task<List<ToDoItem>> GetAll()
         {
-            var toDoItens = await db.ToDoItems.ToListAsync();
+            var user = await userService.GetByEmail(User.Identity.Name);
 
-            return toDoItens;
+            return user.ToDoItems;
         }
 
+        [Authorize()]
         [HttpPost()]
         public async Task<dynamic> Create([FromBody] CreateToDoItemDto modelDto)
         {
-            var toDoItem = new ToDoItem(modelDto.Description, modelDto.Expiration);
+            if (ModelState.IsValid)
+                return modelDto;
 
-            db.Add(toDoItem);
+            var user = await userService.GetByEmail(User.Identity.Name);
+
+            user.AddToDoItem(modelDto.Description, modelDto.Expiration);
+
+            db.Update(user);
             await db.SaveChangesAsync();
 
-            return toDoItem;
+            return Ok();
         }
 
-        [HttpGet("/{toDoItemId}")]
-        public async Task<dynamic> Details(Guid toDoItemId)
+        [Authorize()]
+        [HttpGet("{id}")]
+        public async Task<dynamic> GetById(Guid id)
         {
-            var toDoItem = await db.ToDoItems.SingleOrDefaultAsync(x => x.Id == toDoItemId);
+            var toDoItem = await db.ToDoItems.SingleOrDefaultAsync(x => x.Id == id);
 
             if (toDoItem is null)
                 return NotFound();
@@ -49,6 +61,7 @@ namespace API.Controllers
             return toDoItem;
         }
 
+        [Authorize()]
         [HttpPut()]
         public async Task<dynamic> Update([FromBody] UpdateToDoItemDto modelDto)
         {
@@ -57,7 +70,26 @@ namespace API.Controllers
             if (toDoItem is null)
                 return NotFound();
 
+            toDoItem.UpdateDescriptionAndExpiration(modelDto.Description, modelDto.Expiration);
+
+            await db.SaveChangesAsync();
+
             return toDoItem;
+        }
+
+        [Authorize()]
+        [HttpDelete("{id}")]
+        public async Task<dynamic> Delete(Guid id)
+        {
+            var toDoItem = await db.ToDoItems.SingleOrDefaultAsync(x => x.Id == id);
+
+            if (toDoItem is null)
+                return NotFound();
+
+            db.Remove(toDoItem);
+            await db.SaveChangesAsync();
+
+            return Ok("Item removido");
         }
     }
 }

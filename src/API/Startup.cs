@@ -28,6 +28,7 @@ namespace API
 
             services.AddScoped<AccountService>();
             services.AddScoped<TokenService>();
+            services.AddScoped<UserService>();
 
             var key = Encoding.ASCII.GetBytes(AccountHelper.SecretKey);
             services.AddAuthentication(x =>

@@ -1,8 +1,8 @@
-﻿using API.Dtos;
+﻿using API.Data;
+using API.Dtos;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -11,31 +11,31 @@ namespace API.Controllers
     [Route("login")]
     public class LoginController : Controller
     {
-        public LoginController()
+        private readonly TokenService tokenService;
+        private readonly UserService userService;
+        public LoginController(TokenService tokenService, UserService userService)
         {
-
+            this.tokenService = tokenService;
+            this.userService = userService;
         }
 
-        //[HttpPost]
-        //public async Task<ActionResult<dynamic>> Authenticate([FromBody] UserAccountDto userAuthenticate)
-        //{
-        //    var user = await db.Users.SingleOrDefaultAsync(u => u.Email == userAuthenticate.Email && u.Password == userAuthenticate.Password);
+        [HttpPost]
+        public async Task<dynamic> Authenticate([FromBody] UserAccountDto userAuthenticate)
+        {
+            var user = await userService.GetByEmailAndPassword(userAuthenticate.Email, userAuthenticate.Password);
 
-        //    if (user == null)
-        //        return NotFound(new { message = "Usuário ou senha inválidos" });
+            if (user == null)
+                return NotFound(new { message = "Usuário ou senha inválidos" });
 
-        //    // Gera o Token
-        //    //var token = TokenService.GenerateToken(user);
+            var token = tokenService.GenerateToken(user);
 
-        //    // Oculta a senha
-        //    //user.Password = "";
-
-        //    // Retorna os dados
-        //    return new
-        //    {
-        //        user = user,
-        //        //token = token
-        //    };
-        //}
+            user.CleanPassword();
+            
+            return new
+            {
+                user = user,
+                token = token
+            };
+        }
     }
 }

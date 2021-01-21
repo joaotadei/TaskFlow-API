@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace API.Models
@@ -19,5 +20,12 @@ namespace API.Models
         public string Email { get; private set; }
         public string Password { get; private set; }
         public string Role { get; set; }
+        public List<ToDoItem> ToDoItems { get; private set; } = new List<ToDoItem>();
+
+        public void AddToDoItem(string description, DateTime expiration)
+        {
+            this.ToDoItems.Add(new ToDoItem(description, expiration));
+        }
+        public void CleanPassword() => this.Password = "";
     }
 }
