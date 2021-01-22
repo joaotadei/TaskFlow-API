@@ -16,11 +16,6 @@
             <param name="userAuthenticate"></param>
             <remarks>Usuário admin padrão - login: "admin@admin.com" password: "123456". Retorna o usuário logado junto ao token de autenticação</remarks>
         </member>
-        <member name="T:API.Controllers.ToDoItemsController">
-            <summary>
-            Itens a fazer
-            </summary>
-        </member>
         <member name="M:API.Controllers.ToDoItemsController.Index">
             <summary>
             Lista os itens a fazer do usuário logado.
