@@ -1,17 +1,14 @@
-﻿using API.Data;
-using API.Dtos;
-using API.Helpers;
-using API.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using API.Helpers;
+using Dominio.Entities;
+using Dominio.Models.Dtos;
+using Infra.Data.Context;
 
 namespace API.Services
 {
     public class AccountService
     {
-        private readonly Context db;
-        public AccountService(Context db)
+        private readonly DbTaskFlow db;
+        public AccountService(DbTaskFlow db)
         {
             this.db = db;
             CreateAdmin();
@@ -19,7 +16,7 @@ namespace API.Services
 
         public async Task<User> CreateUser(UserAccountDto modelDto)
         {
-            var newUser = new User(modelDto.Email, modelDto.Password, AccountHelper.DefaultUserRole);
+            var newUser = new User(modelDto.Email, modelDto.Password, AccountConstants.DefaultUserRole);
 
             db.Add(newUser);
             await db.SaveChangesAsync();
@@ -29,7 +26,7 @@ namespace API.Services
 
         public bool AlreadyExisting(string email)
         {
-            var alreadyExisting = db.Users.Any(x => x.Email == email);
+            var alreadyExisting = db.Users.Any(user => user.Email == email);
 
             return alreadyExisting;
         }
@@ -41,7 +38,7 @@ namespace API.Services
             
             if (!AlreadyExisting(adminName))
             {
-                var admin = new User(adminName, defaultPassword, AccountHelper.AdminUserRole);
+                var admin = new User(adminName, defaultPassword, AccountConstants.AdminUserRole);
 
                 db.Add(admin);
                 db.SaveChanges();

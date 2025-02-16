@@ -1,14 +1,10 @@
-﻿using API.Data;
-using API.Dtos;
-using API.Helpers;
+﻿using API.Helpers;
 using API.Services;
+using Dominio.Models.Dtos;
+using Infra.Data.Context;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using X.PagedList;
 
 namespace API.Controllers
@@ -17,10 +13,10 @@ namespace API.Controllers
     [Route("itensAfazer")]
     public class ToDoItemsController : Controller
     {
-        private readonly Context db;
+        private readonly DbTaskFlow db;
         private readonly UserService userService;
         private readonly ToDoItemService toDoItemService;
-        public ToDoItemsController(Context db, UserService userService, ToDoItemService toDoItemService)
+        public ToDoItemsController(DbTaskFlow db, UserService userService, ToDoItemService toDoItemService)
         {
             this.db = db;
             this.userService = userService;
@@ -30,35 +26,49 @@ namespace API.Controllers
         /// <summary>
         /// Lista os itens a fazer do usuário logado.
         /// </summary>
-        [Authorize(Roles = AccountHelper.DefaultUserRole)]
+        [Authorize(Roles = AccountConstants.DefaultUserRole)]
         [HttpGet()]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> Index()
         {
-            var user = await userService.GetByEmail(User.Identity.Name);
+            try
+            {
+                var user = await userService.GetByEmail(User.Identity.Name);
 
-            var items = user.ToDoItems.Select(x => new ToDoItemDto(x));
+                var todoItem = user.ToDoItems.Select(itens => new ToDoItemDto(itens));
 
-            return Ok(items);
+                return Ok(todoItem);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
         /// Criar um novo item a fazer
         /// </summary>
         /// <param name="modelDto"></param>
-        [Authorize(Roles = AccountHelper.DefaultUserRole)]
+        [Authorize(Roles = AccountConstants.DefaultUserRole)]
         [HttpPost()]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> Create([FromBody] CreateToDoItemDto modelDto)
         {
-            if (!ModelState.IsValid)
-                return modelDto;
+            try
+            {
+                if (!ModelState.IsValid)
+                    return modelDto;
 
-            var item = await toDoItemService.CreateNew(modelDto, User);
+                var todoItem = await toDoItemService.CreateNew(modelDto, User.Identity.Name);
 
-            return Ok(item);
+                return Ok(todoItem);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -66,24 +76,31 @@ namespace API.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize(Roles = AccountHelper.DefaultUserRole)]
+        [Authorize(Roles = AccountConstants.DefaultUserRole)]
         [HttpPatch("concluir/{id}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> Finish(Guid id)
         {
-            var user = await userService.GetByEmail(User.Identity.Name);
+            try
+            {
+                var user = await userService.GetByEmail(User.Identity.Name);
 
-            var item = user.ToDoItems.FirstOrDefault(x => x.Id == id);
+                var todoItem = user.ToDoItems.FirstOrDefault(items => items.Id == id);
 
-            if (item is null)
-                return NotFound("Item não encontrado");
+                if (todoItem is null)
+                    return BadRequest("Item não encontrado");
 
-            user.ToDoItems.FirstOrDefault(x => x.Id == id).Finish();
+                user.ToDoItems.FirstOrDefault(items => items.Id == id).Finish();
 
-            await db.SaveChangesAsync();
+                await db.SaveChangesAsync();
 
-            return Ok(new ToDoItemDto(item));
+                return Ok(new ToDoItemDto(todoItem));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -91,27 +108,34 @@ namespace API.Controllers
         /// </summary>
         /// <remarks>Um item já finalizado não poderar mais ser alterado</remarks>
         /// <param name="modelDto"></param>
-        [Authorize(Roles = AccountHelper.DefaultUserRole)]
+        [Authorize(Roles = AccountConstants.DefaultUserRole)]
         [HttpPatch()]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> Update([FromBody] UpdateToDoItemDto modelDto)
         {
-            var user = await userService.GetByEmail(User.Identity.Name);
+            try
+            {
+                var user = await userService.GetByEmail(User.Identity.Name);
 
-            var item = user.ToDoItems.FirstOrDefault(x => x.Id == modelDto.Id);
+                var todoItem = user.ToDoItems.FirstOrDefault(item => item.Id == modelDto.Id);
 
-            if (item is null)
-                return NotFound("Item não encontrado");
+                if (todoItem is null)
+                    return NotFound("Item não encontrado");
 
-            if (item.Finished.HasValue)
-                return BadRequest("Item concluído, não pode ser editado");
+                if (todoItem.Finished.HasValue)
+                    return BadRequest("Item concluído, não pode ser editado");
 
-            item.UpdateDescriptionAndExpiration(modelDto.Description, modelDto.Expiration);
+                todoItem.UpdateDescriptionAndExpiration(modelDto.Description, modelDto.Expiration);
 
-            await db.SaveChangesAsync();
+                await db.SaveChangesAsync();
 
-            return Ok(new ToDoItemDto(item));
+                return Ok(new ToDoItemDto(todoItem));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -120,21 +144,28 @@ namespace API.Controllers
         /// <param name="id"></param>
         /// <remarks>Apenas o admin pode deletar um item </remarks>
         /// <returns></returns>
-        [Authorize(Roles = AccountHelper.AdminUserRole)]
+        [Authorize(Roles = AccountConstants.AdminUserRole)]
         [HttpDelete("{id}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> Delete(Guid id)
         {
-            var item = await db.ToDoItems.FindAsync(id);
+            try
+            {
+                var todoItem = await db.ToDoItems.FindAsync(id);
 
-            if (item is null)
-                return NotFound("Item não encontrado");
+                if (todoItem is null)
+                    return NotFound("Item não encontrado");
 
-            db.Remove(item);
-            await db.SaveChangesAsync();
+                db.Remove(todoItem);
+                await db.SaveChangesAsync();
 
-            return Ok("Item removido");
+                return Ok("Item removido");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -143,19 +174,26 @@ namespace API.Controllers
         /// <param name="pageNumber"></param>
         /// <remarks>Apenas o admin pode listar</remarks>
         /// <returns></returns>
-        [Authorize(Roles = AccountHelper.AdminUserRole)]
+        [Authorize(Roles = AccountConstants.AdminUserRole)]
         [HttpGet("listarTodos/{page}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> GetAll(int? pageNumber)
         {
-            pageNumber = (pageNumber ?? 1);
+            try
+            {
+                pageNumber = (pageNumber ?? 1);
 
-            var items = await db.ToDoItems
-                .Include(x => x.User)
-                .ToPagedListAsync(pageNumber, 5);
+                var todoItems = await db.ToDoItems
+                    .Include(x => x.User)
+                    .ToPagedListAsync(pageNumber, 5);
 
-            return Ok(items.Select(x => new ToDoItemDto(x)).ToList());
+                return Ok(todoItems.Select(item => new ToDoItemDto(item)).ToList());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -164,23 +202,30 @@ namespace API.Controllers
         /// <param name="filtro"></param>
         /// <remarks>Apenas o admin pode listar</remarks>
         /// <returns></returns>
-        [Authorize(Roles = AccountHelper.AdminUserRole)]
+        [Authorize(Roles = AccountConstants.AdminUserRole)]
         [HttpGet("buscarItensAtrasadosPorDescricaoOuData/{filtro}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> FindByDescriptionDataDelayed(string filtro = "")
         {
-            filtro = filtro.ToLower();
+            try
+            {
+                filtro = filtro.ToLower();
 
-            var items = await db.ToDoItems
-                .Include(x => x.User)
-                .Where(x => x.User.Email.ToLower().Contains(filtro) ||
-                            x.Description.ToLower().Contains(filtro) ||
-                            x.Creation.ToShortDateString().Contains(filtro) ||
-                            x.Expiration.ToShortDateString().Contains(filtro))
-                .ToListAsync();
+                var todoItems = await db.ToDoItems
+                    .Include(x => x.User)
+                    .Where(x => x.User.Email.ToLower().Contains(filtro) ||
+                                x.Description.ToLower().Contains(filtro) ||
+                                x.Creation.ToShortDateString().Contains(filtro) ||
+                                x.Expiration.ToShortDateString().Contains(filtro))
+                    .ToListAsync();
 
-            return Ok(items.Where(x => x.Dalayed).Select(x => new ToDoItemDto(x)).ToList());
+                return Ok(todoItems.Where(x => x.Dalayed).Select(x => new ToDoItemDto(x)).ToList());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

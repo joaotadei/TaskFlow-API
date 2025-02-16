@@ -1,32 +1,30 @@
-﻿using API.Data;
-using API.Helpers;
-using API.Models;
+﻿using Dominio.Entities;
+using Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace API.Services
 {
     public class UserService
     {
-        private readonly Context db;
-        public UserService(Context db)
+        private readonly DbTaskFlow db;
+        public UserService(DbTaskFlow db)
         {
             this.db = db;
         }
 
-        public async Task<User> GetByEmail(string email)
+        public async Task<User?> GetByEmail(string email)
         {
             return await db.Users
-                .Include(x => x.ToDoItems)
-                .SingleOrDefaultAsync(x => x.Email == email);
+                .Include(user => user.ToDoItems)
+                .SingleOrDefaultAsync(user => user.Email == email);
         }
 
-        public async Task<User> GetByEmailAndPassword(string email, string password)
+        public async Task<User?> GetByEmailAndPassword(string email, string password)
         {
             return await db.Users
-                .Include(x => x.ToDoItems)
+                .Include(user => user.ToDoItems)
                 .AsNoTracking()
-                .SingleOrDefaultAsync(x => x.Email == email && x.Password == password);
+                .SingleOrDefaultAsync(user => user.Email == email && user.Password == password);
         }
     }
 }

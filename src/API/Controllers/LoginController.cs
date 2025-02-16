@@ -1,11 +1,7 @@
-﻿using API.Data;
-using API.Dtos;
-using API.Services;
+﻿using API.Services;
+using Dominio.Models.Dtos;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace API.Controllers
 {
@@ -34,20 +30,29 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<dynamic> Authenticate([FromBody] UserAccountDto userAuthenticate)
         {
-            var user = await userService.GetByEmailAndPassword(userAuthenticate.Email, userAuthenticate.Password);
-
-            if (user == null)
-                return NotFound(new { message = "Usuário ou senha inválidos" });
-
-            var token = tokenService.GenerateToken(user);
-
-            user.CleanPassword();
-            
-            return new
+            try
             {
-                user = user,
-                token = token
-            };
+                var user = await userService.GetByEmailAndPassword(userAuthenticate.Email, userAuthenticate.Password);
+
+                if (user == null)
+                    return BadRequest(new { message = "Usuário ou senha inválidos" });
+
+                var token = tokenService.GenerateToken(user);
+
+                user.CleanPassword();
+
+                var userDto = new
+                {
+                    user = user,
+                    token = token
+                };
+
+                return Ok(userDto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

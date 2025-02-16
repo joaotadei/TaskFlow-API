@@ -1,8 +1,6 @@
-﻿using API.Models;
-using System;
-using System.Collections.Generic;
+﻿using Dominio.Entities;
 
-namespace API.Dtos
+namespace Dominio.Models.Dtos
 {
     public class ToDoItemDto
     {

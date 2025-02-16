@@ -1,6 +1,6 @@
 ﻿namespace API.Helpers
 {
-    public static class AccountHelper
+    public static class AccountConstants
     {
        public const string DefaultUserRole = "StandardUser";
        public const string AdminUserRole = "Admin";

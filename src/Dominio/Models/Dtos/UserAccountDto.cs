@@ -1,7 +1,7 @@
 ﻿using DataAnnotationsExtensions;
 using System.ComponentModel.DataAnnotations;
 
-namespace API.Dtos
+namespace Dominio.Models.Dtos
 {
     public class UserAccountDto
     {

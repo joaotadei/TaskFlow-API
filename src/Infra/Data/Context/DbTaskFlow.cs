@@ -1,14 +1,15 @@
-﻿using API.Models;
+﻿using Dominio.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace API.Data
+namespace Infra.Data.Context
 {
-    public class Context : DbContext
+    public class DbTaskFlow : DbContext
     {
-        public Context(DbContextOptions<Context> options) : base(options) { }
+        public DbTaskFlow(DbContextOptions<DbTaskFlow> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
         }
 
         public virtual DbSet<User> Users { get; set; }

@@ -1,27 +1,22 @@
-﻿using API.Data;
-using API.Dtos;
-using API.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using Dominio.Entities;
+using Dominio.Models.Dtos;
+using Infra.Data.Context;
 
 namespace API.Services
 {
     public class ToDoItemService
     {
-        private readonly Context db;
+        private readonly DbTaskFlow db;
         private readonly UserService userService;
-        public ToDoItemService(Context db, UserService userService)
+        public ToDoItemService(DbTaskFlow db, UserService userService)
         {
             this.db = db;
             this.userService = userService;
         }
 
-        public async Task<dynamic> CreateNew(CreateToDoItemDto modelDto, ClaimsPrincipal userIdentity)
+        public async Task<ToDoItemDto> CreateNew(CreateToDoItemDto modelDto, string currentUserEmail)
         {
-            var user = await userService.GetByEmail(userIdentity.Identity.Name);
+            var user = await userService.GetByEmail(currentUserEmail);
 
             var newItem = new ToDoItem(modelDto.Description, modelDto.Expiration);
             

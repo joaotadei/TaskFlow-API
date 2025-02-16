@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace API.Dtos
+namespace Dominio.Models.Dtos
 {
     public class UpdateToDoItemDto
     {

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace API.Models
+namespace Dominio.Entities
 {
     public class ToDoItem
     {
@@ -40,7 +38,6 @@ namespace API.Models
             }
         }
 
-
         public void UpdateDescriptionAndExpiration(string description, DateTime expiration)
         {
             this.Description = description;
@@ -48,6 +45,7 @@ namespace API.Models
 
             LogAction($"Updated item by {this.User.Email}");
         }
+
         public void Finish()
         {
             this.Finished = DateTime.Now;

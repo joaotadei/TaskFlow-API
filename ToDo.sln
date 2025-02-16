@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30907.101
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "src\API\API.csproj", "{62A6FFAB-840F-4D67-AC41-9E5094ADACEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "src\Tests\Tests.csproj", "{D69DBDF1-CC30-41A1-9622-CFFD4B60D3D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "src\Tests\Tests.csproj", "{D69DBDF1-CC30-41A1-9622-CFFD4B60D3D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infra", "src\Infra\Infra.csproj", "{25BD64BE-FDF0-4E7B-AC6E-0808708120B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dominio", "src\Dominio\Dominio.csproj", "{3DB3A200-A357-4F42-A162-A0525E7230E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{D69DBDF1-CC30-41A1-9622-CFFD4B60D3D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D69DBDF1-CC30-41A1-9622-CFFD4B60D3D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D69DBDF1-CC30-41A1-9622-CFFD4B60D3D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25BD64BE-FDF0-4E7B-AC6E-0808708120B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25BD64BE-FDF0-4E7B-AC6E-0808708120B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25BD64BE-FDF0-4E7B-AC6E-0808708120B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25BD64BE-FDF0-4E7B-AC6E-0808708120B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DB3A200-A357-4F42-A162-A0525E7230E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DB3A200-A357-4F42-A162-A0525E7230E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DB3A200-A357-4F42-A162-A0525E7230E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DB3A200-A357-4F42-A162-A0525E7230E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
